@@ -5,11 +5,10 @@
     <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UseWpf>False</UseWpf>
-    <UseWindowsForms>True</UseWindowsForms>
+    <UseWpf>True</UseWpf>
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <None Remove="app.manifest" />
     <None Remove="appsettings.json" />
@@ -29,27 +28,21 @@
     <Content Include="nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Update="appsettings.dev.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Gameshow.Desktop.View\Gameshow.Desktop.View.csproj" />
     <ProjectReference Include="..\Gameshow.Shared\Gameshow.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="appsettings.dev.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="CefSharp.WinForms.NETCore" Version="121.3.130" />
-    <PackageReference Include="MaterialSkin.2" Version="2.3.1" />
     <PackageReference Include="Websocket.Client" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Components\" />
-    <Folder Include="Toasts\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 

@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <EnableDefaultPageItems>false</EnableDefaultPageItems>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Gameshow.Desktop.ViewModel\Gameshow.Desktop.ViewModel.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Component\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Page Include="Window\DlgLogin.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MaterialDesignThemes" Version="5.0.0" />
+    </ItemGroup>
+
+</Project>
