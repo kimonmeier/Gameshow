@@ -1,4 +1,5 @@
-﻿using Gameshow.Desktop.Services;
+﻿using Gameshow.Desktop.Dialogs;
+using Gameshow.Desktop.Services;
 using Gameshow.Shared.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,13 +19,14 @@ namespace Gameshow.Desktop
             services.AddSingleton<ConnectionManager>();
             services.AddSingleton<PlayerManager>();
             services.AddForms();
+            services.AddDialogs();
 
             return services;
         }
 
         public static IServiceCollection AddDialogs(this IServiceCollection services)
         {
-
+            services.AddTransient<DlgLogin>();
 
             return services;
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,12 +16,17 @@ namespace Gameshow.Shared.Events.Base
         /// <summary>
         /// Gibt an ob das Event eine Antwort zurückliefert
         /// </summary>
-        public bool HasAnswer { get; set; }
+        public required bool HasAnswer { get; init; }
 
         /// <summary>
         /// Die ID des erstellten Events
         /// </summary>
-        public Guid EventGuid { get; set; }
+        public required Guid EventGuid { get; init; }
+
+        /// <summary>
+        /// Die ID welche benutzt wird für das Tracing
+        /// </summary>
+        public required string SentryTraceHeader { get; init; }
 
         /// <summary>
         /// Der Request welcher gesendet werden soll

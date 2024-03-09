@@ -4,6 +4,6 @@ namespace Gameshow.Server.Services;
 
 public sealed class ClientSocketProvider
 {
-    public IWebSocketConnection Client { get; set; }
+    public required IWebSocketConnection Client { get; set; }
     
 }

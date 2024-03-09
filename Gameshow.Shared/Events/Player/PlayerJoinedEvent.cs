@@ -5,9 +5,9 @@
 /// </summary>
 public sealed class PlayerJoinedEvent : IRequest
 {
-    public Guid PlayerId { get; init; }
+    public required Guid PlayerId { get; init; }
     
-    public string Name { get; init; }
+    public required string Name { get; init; }
     
-    public string Link { get; init; }
+    public required string Link { get; init; }
 }

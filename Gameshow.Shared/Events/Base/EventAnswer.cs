@@ -1,4 +1,6 @@
-﻿namespace Gameshow.Shared.Events.Base
+﻿using Sentry;
+
+namespace Gameshow.Shared.Events.Base
 {
     /// <summary>
     /// Dieses Event setzt die Antwort
@@ -14,6 +16,11 @@
         /// Der Typ welcher die Antwort beschreibt
         /// </summary>
         public required string AnswerTypeFullName { get; init; }
+
+        /// <summary>
+        /// Der Sentry Trace Header um die Requests im Nachhinein nachvollziehen zu können
+        /// </summary>
+        public required string SentryTraceHeader { get; init; }
         
         /// <summary>
         /// Die Antwort welche gesetzt werden soll

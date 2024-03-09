@@ -5,12 +5,21 @@
     <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UseWpf>True</UseWpf>
+    <UseWpf>False</UseWpf>
+    <UseWindowsForms>True</UseWindowsForms>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="app.manifest" />
     <None Remove="appsettings.json" />
     <None Remove="nlog.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="app.manifest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>
@@ -33,11 +42,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MaterialDesignThemes" Version="5.0.0-ci508" />
+    <PackageReference Include="CefSharp.WinForms.NETCore" Version="121.3.130" />
+    <PackageReference Include="MaterialSkin.2" Version="2.3.1" />
     <PackageReference Include="Websocket.Client" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Components\" />
+    <Folder Include="Toasts\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 

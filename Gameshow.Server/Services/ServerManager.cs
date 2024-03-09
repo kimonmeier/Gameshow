@@ -82,9 +82,6 @@ namespace Gameshow.Server.Services
                     using (IServiceScope scope = serviceProvider.CreateScope())
                     {
                         scope.ServiceProvider.GetRequiredService<ClientSocketProvider>().Client = socket;
-                        var sentryEngine = scope.ServiceProvider.GetRequiredService<SentryEngine>();
-                        sentryEngine.StartTransaction("Websocket", "OnMessage");
-
                         try
                         {
                             BaseEvent? @event = JsonSerializer.Deserialize<BaseEvent>(payload);
@@ -93,24 +90,36 @@ namespace Gameshow.Server.Services
                             {
                                 throw new ArgumentException($"The provided payload is not of the Type {typeof(BaseEvent).FullName}");
                             }
-                            
-                            logger.LogInformation("Recieved the Event {0} from the client identified by {1}", @event.Request.GetType().Name, socket.ConnectionInfo.Id);
-                            
-                            IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-                            var result = mediator.Send(@event.Request).ConfigureAwait(true).GetAwaiter().GetResult();
 
-                            if (@event.HasAnswer)
+
+                            ITransaction sentryTransaction = SentrySdk.StartTransaction("Connection", "MessageRecieved", SentryTraceHeader.Parse(@event.SentryTraceHeader));
+
+                            try
                             {
-                                using SentryEngine childEngine = sentryEngine.StartChild("Websocket", "OnMessage - Return");
-                                SendMessage(socket, new EventAnswer() { EventGuid = @event.EventGuid, AnswerTypeFullName = (result?.GetType() ?? typeof(object)).FullName!, Answer = JsonSerializer.Serialize(result) });
-                                childEngine.FlushTransaction();
+                                logger.LogInformation("Recieved the Event {0} from the client identified by {1}", @event.Request.GetType().Name, socket.ConnectionInfo.Id);
+
+                                IMediator mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+                                ISpan mediatrSpan = sentryTransaction.StartChild("Processing", "Processes the event by MediatR");
+                                var result = mediator.Send(@event.Request).ConfigureAwait(true).GetAwaiter().GetResult();
+                                mediatrSpan.Finish();
+
+                                if (@event.HasAnswer)
+                                {
+                                    ISpan resultSpan = sentryTransaction.StartChild("Answer", "Sends the Answer to the client");
+                                    SendMessage(socket, new EventAnswer() { EventGuid = @event.EventGuid, AnswerTypeFullName = (result?.GetType() ?? typeof(object)).FullName!, SentryTraceHeader = @event.SentryTraceHeader, Answer = JsonSerializer.Serialize(result) });
+                                    resultSpan.Finish();
+                                }
+                            } catch (Exception ex)
+                            {
+                                sentryTransaction.Finish(ex);
                             }
-                        } catch (Exception ex)
+
+                            sentryTransaction.Finish();
+                        }
+                        catch (Exception ex)
                         {
-                            sentryEngine.CaptureException(ex);
-                        } finally
-                        {
-                            sentryEngine.FlushTransaction();
+                            SentrySdk.CaptureException(ex);
                         }
                     }
                 };
@@ -144,14 +153,17 @@ namespace Gameshow.Server.Services
 
         public void SendMessage(IWebSocketConnection client, IRequest request)
         {
+            ITransaction sentryTransaction = SentrySdk.StartTransaction("Connection", "Send");
             BaseEvent @event = new BaseEvent()
             {
                 EventGuid = Guid.NewGuid(),
                 HasAnswer = false,
-                Request = request
+                Request = request,
+                SentryTraceHeader = sentryTransaction.GetTraceHeader().ToString()
             };
 
             client.Send(JsonSerializer.Serialize(@event)).ConfigureAwait(true).GetAwaiter().GetResult();
+            sentryTransaction.Finish();
         }
 
         public void SendMessage(IRequest request)
@@ -171,16 +183,29 @@ namespace Gameshow.Server.Services
 
             runningRequest.Add(eventGuid, taskCompletionSource);
 
+            ITransaction sentryTransaction = SentrySdk.StartTransaction("Connection", "SendAndAwait");
             BaseEvent @event = new BaseEvent()
             {
                 EventGuid = Guid.NewGuid(),
                 HasAnswer = true,
-                Request = request
+                Request = request,
+                SentryTraceHeader = sentryTransaction.GetTraceHeader().ToString()
             };
 
+            ISpan sendDataSpan = sentryTransaction.StartChild("Send", "Sends the Data to the Client");
             client.Send(JsonSerializer.Serialize(@event)).ConfigureAwait(true).GetAwaiter().GetResult();
+            sendDataSpan.Finish();
 
-            return taskCompletionSource.Task.ConfigureAwait(true).GetAwaiter().GetResult() as TAnswer;
+            ISpan waitForAnswerSpan = sentryTransaction.StartChild("Wait", "Waits for the Reply by the Client");
+            try
+            {
+                return taskCompletionSource.Task.ConfigureAwait(true).GetAwaiter().GetResult() as TAnswer;
+            }
+            finally
+            {
+                waitForAnswerSpan.Finish();
+                sentryTransaction.Finish();
+            }
         }
 
         public void RecievedAnswer(Guid eventGuid, dynamic? result)

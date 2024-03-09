@@ -2,6 +2,11 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+#pragma warning disable CS8604 // Possible null reference argument.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+
 namespace Gameshow.Shared.Events.Base;
 
 public class InterfaceConverter<T> : JsonConverter<T>
@@ -49,20 +54,20 @@ public class InterfaceConverter<T> : JsonConverter<T>
                 JsonSerializer.Serialize(writer, (T)null, options);
                 break;
             default:
-            {
                 var type = value.GetType();
-                using var jsonDocument = JsonDocument.Parse(JsonSerializer.Serialize(value, type, options));
-                writer.WriteStartObject();
-                writer.WriteString("$type", type.FullName);
-
-                foreach (var element in jsonDocument.RootElement.EnumerateObject())
+                using (var jsonDocument = JsonDocument.Parse(JsonSerializer.Serialize(value, type, options)))
                 {
-                    element.WriteTo(writer);
-                }
+                    writer.WriteStartObject();
+                    writer.WriteString("$type", type.FullName);
 
-                writer.WriteEndObject();
+                    foreach (var element in jsonDocument.RootElement.EnumerateObject())
+                    {
+                        element.WriteTo(writer);
+                    }
+
+                    writer.WriteEndObject();
+                }
                 break;
-            }
         }
     }
 }

@@ -3,6 +3,7 @@ using Gameshow.Shared.Engines;
 using Gameshow.Shared.Events.Base;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Sentry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,18 +17,16 @@ namespace Gameshow.Desktop.Services
     public class ConnectionManager : IDisposable
     {
         private readonly IConfiguration configuration;
-        private readonly SentryEngine sentryEngine;
         private readonly ILogger<ConnectionManager> logger;
         private readonly ILogger<Connection> connectionLogger;
         private readonly IMediator mediator;
         private readonly Dictionary<Guid, TaskCompletionSource<dynamic>> runningRequest = new();
         private Connection? connection;
 
-        public ConnectionManager(IConfiguration configuration, ILogger<ConnectionManager> logger, SentryEngine sentryEngine, ILogger<Connection> connectionLogger, IMediator mediator)
+        public ConnectionManager(IConfiguration configuration, ILogger<ConnectionManager> logger, ILogger<Connection> connectionLogger, IMediator mediator)
         {
             this.configuration = configuration;
             this.logger = logger;
-            this.sentryEngine = sentryEngine;
             this.connectionLogger = connectionLogger;
             this.mediator = mediator;
         }
@@ -44,7 +43,7 @@ namespace Gameshow.Desktop.Services
             }
 
             logger.LogInformation("Trying to establish a connection to the server");
-            connection = new Connection(serverConfiguration, sentryEngine, connectionLogger, mediator);
+            connection = new Connection(serverConfiguration, connectionLogger, mediator);
 
             try
             {
@@ -81,14 +80,17 @@ namespace Gameshow.Desktop.Services
 
         public void Send(IRequest request)
         {
+            ITransaction sentryTransaction = SentrySdk.StartTransaction("Connection", "Send");
             BaseEvent @event = new BaseEvent()
             {
                 HasAnswer = false,
                 EventGuid = Guid.NewGuid(),
-                Request = request
+                Request = request,
+                SentryTraceHeader = sentryTransaction.GetTraceHeader().ToString(),
             };
 
             this.connection!.Send(@event);
+            sentryTransaction.Finish();
         }
 
         public TAnswer Send<TAnswer>(IRequest<TAnswer> request) where TAnswer : new()
@@ -98,16 +100,28 @@ namespace Gameshow.Desktop.Services
 
             runningRequest.Add(eventGuid, completionSource);
 
+            ITransaction sentryTransaction = SentrySdk.StartTransaction("Connection", "SendAndAwait");
             BaseEvent @event = new BaseEvent()
             {
                 HasAnswer = true,
                 EventGuid = eventGuid,
-                Request = request
+                Request = request,
+                SentryTraceHeader = sentryTransaction.GetTraceHeader().ToString()
             };
 
+            ISpan sendDataSpan = sentryTransaction.StartChild("Send", "Sends the Data to the Server");
             this.connection!.Send(@event);
+            sendDataSpan.Finish();
 
-            return (TAnswer) completionSource.Task.ConfigureAwait(true).GetAwaiter().GetResult();
+            ISpan waitForAnswerSpan = sentryTransaction.StartChild("Wait", "Waits for the Reply by the Server");
+            try
+            {
+                return (TAnswer)completionSource.Task.ConfigureAwait(true).GetAwaiter().GetResult();
+            } finally
+            {
+                waitForAnswerSpan.Finish();
+                sentryTransaction.Finish();
+            }
         }
 
         public void SetResult(Guid eventGuid, dynamic result)
@@ -115,12 +129,32 @@ namespace Gameshow.Desktop.Services
             runningRequest[eventGuid].SetResult(result);
         }
 
+        public void RegisterEventHandler<TRequest>(Action handler) where TRequest : IBaseRequest
+        {
+            if (this.connection is null)
+            {
+                throw new ArgumentNullException("The Connection is not yet initialised");
+            }
+
+            this.connection.RegisterEventHandler<TRequest>(handler);
+        }
+
+        public void UnregisterEventHandler<TRequest>(Action handler) where TRequest : IBaseRequest
+        {
+            if (this.connection is null)
+            {
+                throw new ArgumentNullException("The Connection is not yet initialised");
+            }
+
+            this.connection.UnregisterEventHandler<TRequest>(handler);
+        }
+
         public void Dispose()
         {
             Task.Delay(1000).ConfigureAwait(true).GetAwaiter().GetResult();
             connection?.Disconnect();
             connection?.Dispose();
-            sentryEngine.Dispose();
+            SentrySdk.Flush();
         }
     }
 }
