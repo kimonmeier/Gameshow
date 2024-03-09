@@ -10,11 +10,12 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Gameshow.Desktop.ViewModel.Base.Services;
 using Websocket.Client;
 
 namespace Gameshow.Desktop.Services
 {
-    public class ConnectionManager : IDisposable
+    public class ConnectionManager : IDisposable, IConnectionManager
     {
         private readonly IConfiguration configuration;
         private readonly ILogger<ConnectionManager> logger;

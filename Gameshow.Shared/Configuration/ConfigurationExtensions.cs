@@ -19,8 +19,11 @@ namespace Gameshow.Shared.Configuration
         /// <returns></returns>
         public static IConfiguration LoadBasisConfiguration(this ConfigurationBuilder configurationBuilder) 
             => configurationBuilder
-                .AddJsonFile("appsettings.json", true, true)
+#if DEBUG
                 .AddJsonFile($"appsettings.dev.json", true, true)
+#else
+                .AddJsonFile("appsettings.json", true, true)
+#endif
                 .Build();
     }
 }

@@ -6,7 +6,7 @@ public partial class DlgLogin : System.Windows.Window
 {
     public DlgLogin(LoginViewModel loginViewModel)
     {
-        this.DataContext = loginViewModel;
         InitializeComponent();
+        this.DataContext = loginViewModel;
     }
 }

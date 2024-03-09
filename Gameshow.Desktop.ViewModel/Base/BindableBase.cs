@@ -1,10 +1,20 @@
 ﻿using System.ComponentModel;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Gameshow.Desktop.ViewModel.Base;
 
 public abstract class BindableBase : INotifyPropertyChanged
 {
+    private List<PropertyInfo> _commandBases;
+    private MethodInfo _commandBaseRetriggerExecute;
+
+    protected BindableBase()
+    {
+        _commandBases = this.GetType().GetProperties().Where(x => x.PropertyType == typeof(CommandBase)).ToList();
+        _commandBaseRetriggerExecute = typeof(CommandBase).GetMethod(nameof(CommandBase.RaiseCanExecuteChanged))!;
+    }
+
     /// <summary>
     /// Multicast event for property change notifications.
     /// </summary>
@@ -41,5 +51,10 @@ public abstract class BindableBase : INotifyPropertyChanged
     {
         var eventHandler = this.PropertyChanged;
         eventHandler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        
+        foreach (PropertyInfo commandProperty in _commandBases)
+        {
+            _commandBaseRetriggerExecute.Invoke(commandProperty.GetValue(this), []);
+        }
     }
 }

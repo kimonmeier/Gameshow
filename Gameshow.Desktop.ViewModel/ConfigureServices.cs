@@ -11,4 +11,11 @@ public static class ConfigureServices
 
         return services;
     }
+
+    public static IServiceCollection AddViewCommands(this IServiceCollection services)
+    {
+        services.AddTransient<LoginCommand>();
+
+        return services;
+    }
 }

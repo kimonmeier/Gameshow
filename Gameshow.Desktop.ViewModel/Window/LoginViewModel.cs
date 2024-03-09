@@ -1,4 +1,5 @@
-﻿using Gameshow.Desktop.ViewModel.Base;
+﻿using System.Windows.Input;
+using Gameshow.Desktop.ViewModel.Base;
 
 namespace Gameshow.Desktop.ViewModel.Window;
 
@@ -6,7 +7,17 @@ public sealed class LoginViewModel : BindableBase
 {
     private string? name;
     private string? link;
-    private bool connected;
+    private bool disconnected = true;
+
+    public LoginViewModel(LoginCommand loginCommand)
+    {
+        this.LoginCommand = loginCommand;
+    }
+
+    [Obsolete("Just for Designer")]
+    public LoginViewModel()
+    {
+    }
 
     public string? Name
     {
@@ -28,13 +39,15 @@ public sealed class LoginViewModel : BindableBase
         }
     }
 
-    public bool Connected
+    public bool Disconnected
     {
-        get => connected;
+        get => disconnected;
         set
         {
-            connected = value;
+            disconnected = value;
             OnPropertyChanged();
         }
     }
+
+    public CommandBase LoginCommand { get; }
 }

@@ -1,6 +1,8 @@
-﻿namespace Gameshow.Desktop.Services;
+﻿using Gameshow.Desktop.ViewModel.Base.Services;
 
-public sealed class PlayerManager
+namespace Gameshow.Desktop.Services;
+
+public sealed class PlayerManager : IPlayerManager
 {
     public class PlayerInformation
     {

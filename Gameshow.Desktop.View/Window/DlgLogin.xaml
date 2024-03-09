@@ -4,8 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:Gameshow.Desktop.View.Window"
-        xmlns:vwwindow="clr-namespace:Gameshow.Desktop.ViewModel.Window;assembly=Gameshow.Desktop.ViewModel"
+        xmlns:local="clr-namespace:Gameshow.Desktop.ViewModel.Window;assembly=Gameshow.Desktop.ViewModel"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         TextElement.FontWeight="Medium"
@@ -13,9 +12,6 @@
         FontFamily="{materialDesign:MaterialDesignFont}"
         Title="GameShow Login" Height="400" Width="400"
         ResizeMode="NoResize">
-    <Window.DataContext>
-        <vwwindow:LoginViewModel></vwwindow:LoginViewModel>
-    </Window.DataContext>
     <Grid>
         <materialDesign:Card Padding="16" Margin="32">
             <StackPanel>
@@ -26,13 +22,13 @@
                 <StackPanel Margin="0px 10px 0px 0px">
                     <StackPanel  Orientation="Horizontal">
                         <Label VerticalAlignment="Center" HorizontalContentAlignment="Right" Width="50px" Margin="0px 0px 10px 0px">Name:</Label>
-                        <TextBox Text="{Binding Path=Name}" Width="200px"></TextBox>
+                        <TextBox Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" Width="200px"></TextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label VerticalAlignment="Center" HorizontalContentAlignment="Right" Width="50px" Margin="0px 0px 10px 0px">Link:</Label>
-                        <TextBox Text="{Binding Link}" Width="200px"></TextBox>
+                        <TextBox Text="{Binding Link, UpdateSourceTrigger=PropertyChanged}" Width="200px"></TextBox>
                     </StackPanel>
-                    <Button Margin="40 20" IsEnabled="{Binding !Connected}" >Einloggen</Button>
+                    <Button Command="{Binding Path=LoginCommand}" CommandParameter="{Binding .}" Margin="40 20" IsEnabled="{Binding Path=Disconnected, Mode=OneWay}" >Einloggen</Button>
                 </StackPanel>
             </StackPanel>
         </materialDesign:Card>
