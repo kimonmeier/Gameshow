@@ -1,20 +1,16 @@
-﻿using System.Windows.Input;
-using Gameshow.Desktop.ViewModel.Base;
-using Gameshow.Desktop.ViewModel.Base.Services;
-using Gameshow.Shared.Events.Player;
-using Gameshow.Shared.Events.Player.Enums;
-
-namespace Gameshow.Desktop.ViewModel.Window;
+﻿namespace Gameshow.Desktop.ViewModel.Window;
 
 public sealed class LoginCommand : CommandBase
 {
     private readonly IConnectionManager connectionManager;
     private readonly IPlayerManager playerManager;
+    private readonly IGameManager gameManager;
 
-    public LoginCommand(IConnectionManager connectionManager, IPlayerManager playerManager)
+    public LoginCommand(IConnectionManager connectionManager, IPlayerManager playerManager, IGameManager gameManager)
     {
         this.connectionManager = connectionManager;
         this.playerManager = playerManager;
+        this.gameManager = gameManager;
     }
 
     public override bool CanExecute(object? parameter)
@@ -22,6 +18,11 @@ public sealed class LoginCommand : CommandBase
         if (parameter is not LoginViewModel vmLogin)
         {
             return false;
+        }
+
+        if (gameManager.PlayerType != PlayerType.Player)
+        {
+            return true;
         }
 
         return !string.IsNullOrWhiteSpace(vmLogin.Link) && !string.IsNullOrWhiteSpace(vmLogin.Name) && vmLogin.Disconnected;
@@ -43,7 +44,7 @@ public sealed class LoginCommand : CommandBase
             {
                 Name = vmLogin.Name!,
                 Link = vmLogin.Link!,
-                Type = PlayerType.Player
+                Type = gameManager.PlayerType
             };
             
             playerManager.PlayerId = connectionManager.Send(@event);

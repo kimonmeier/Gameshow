@@ -1,12 +1,10 @@
-﻿using Gameshow.Desktop.Services;
-
-namespace Gameshow.Desktop.Events.Player;
+﻿namespace Gameshow.Desktop.Events.Player;
 
 public sealed class PlayerLeftEventHandler : IRequestHandler<PlayerLeftEvent>
 {
-    private readonly PlayerManager playerManager;
+    private readonly IPlayerManager playerManager;
 
-    public PlayerLeftEventHandler(PlayerManager playerManager)
+    public PlayerLeftEventHandler(IPlayerManager playerManager)
     {
         this.playerManager = playerManager;
     }
@@ -14,11 +12,7 @@ public sealed class PlayerLeftEventHandler : IRequestHandler<PlayerLeftEvent>
     public async Task Handle(PlayerLeftEvent request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
-        if (request.PlayerId == playerManager.PlayerId)
-        {
-            return;
-        }
 
-        playerManager.Opponents.RemoveAll(x => x.PlayerId == request.PlayerId);
+        playerManager.RemovePlayer(request.PlayerId);
     }
 }

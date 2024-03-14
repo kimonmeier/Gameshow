@@ -1,6 +1,4 @@
-﻿using Gameshow.Server.Services;
-
-namespace Gameshow.Server.Events.Player;
+﻿namespace Gameshow.Server.Events.Player;
 
 public class PlayerDisconnectingEventHandler : IRequestHandler<PlayerDisconnectingEvent>
 {

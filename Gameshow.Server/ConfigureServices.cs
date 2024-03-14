@@ -1,6 +1,5 @@
 ﻿using EFCoreSecondLevelCacheInterceptor;
 using Gameshow.Server.Database.Context;
-using Gameshow.Server.Services;
 using Gameshow.Shared.Configuration;
 using Gameshow.Shared.Services;
 using Microsoft.EntityFrameworkCore;
@@ -8,11 +7,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Sentry;
 using Sentry.Protocol;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Gameshow.Server
 {

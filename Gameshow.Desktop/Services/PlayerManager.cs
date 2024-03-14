@@ -1,24 +1,39 @@
-﻿using Gameshow.Desktop.ViewModel.Base.Services;
-
-namespace Gameshow.Desktop.Services;
+﻿namespace Gameshow.Desktop.Services;
 
 public sealed class PlayerManager : IPlayerManager
 {
-    public class PlayerInformation
-    {
-        public required Guid PlayerId { get; set; }
-        
-        public required string Name { get; set; }
-        
-        public required string Link { get; set; }
-    }
+    private readonly List<PlayerInformation> opponents;
+    private readonly IPlayerScoreFactory playerScoreFactory;
     
     public Guid PlayerId { get; set; }
-    
-    public List<PlayerInformation> Opponents { get; init; }
+    public IReadOnlyList<PlayerInformation> Opponents => opponents.AsReadOnly();
 
-    public PlayerManager()
+    public PlayerManager(IPlayerScoreFactory playerScoreFactory)
     {
-        Opponents = new List<PlayerInformation>();
+        this.playerScoreFactory = playerScoreFactory;
+        opponents = new List<PlayerInformation>();
+    }
+    
+    public void RegisterPlayer(Guid playerGuid, string name, string link)
+    {
+        PlayerInformation playerInformation = new PlayerInformation()
+        {
+            PlayerId = playerGuid,
+            Name = name,
+            Link = link
+        };
+        if (playerGuid != PlayerId)
+        {
+            opponents.Add(playerInformation);
+        }
+        
+        playerScoreFactory.RegisterPlayer(playerInformation);
+    }
+
+    public void RemovePlayer(Guid playerGuid)
+    {
+        opponents.RemoveAll(x=> x.PlayerId == playerGuid);
+        
+        playerScoreFactory.RemovePlayer(playerGuid);
     }
 }

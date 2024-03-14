@@ -1,12 +1,10 @@
-﻿using Gameshow.Desktop.Services;
-
-namespace Gameshow.Desktop.Events.Player;
+﻿namespace Gameshow.Desktop.Events.Player;
 
 public sealed class PlayerJoinedEventHandler : IRequestHandler<PlayerJoinedEvent>
 {
-    private readonly PlayerManager playerManager;
+    private readonly IPlayerManager playerManager;
 
-    public PlayerJoinedEventHandler(PlayerManager playerManager)
+    public PlayerJoinedEventHandler(IPlayerManager playerManager)
     {
         this.playerManager = playerManager;
     }
@@ -14,14 +12,7 @@ public sealed class PlayerJoinedEventHandler : IRequestHandler<PlayerJoinedEvent
     public async Task Handle(PlayerJoinedEvent request, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
-        if (request.PlayerId == playerManager.PlayerId)
-        {
-            return;
-        }
 
-        playerManager.Opponents.Add(new PlayerManager.PlayerInformation()
-        {
-            PlayerId = request.PlayerId, Name = request.Name, Link = request.Link
-        });
+        playerManager.RegisterPlayer(request.PlayerId, request.Name, request.Link);
     }
 }

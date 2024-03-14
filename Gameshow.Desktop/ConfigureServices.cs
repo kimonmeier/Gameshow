@@ -8,7 +8,7 @@ using Gameshow.Desktop.ViewModel.Base.Services;
 
 namespace Gameshow.Desktop
 {
-    internal static class ConfigureServices
+    public static class ConfigureServices
     {
         public static IServiceCollection AddClientServices(this IServiceCollection services, IConfiguration configuration)
         {
@@ -17,6 +17,10 @@ namespace Gameshow.Desktop
             services.AddSingleton<IConnectionManager>(opt => opt.GetRequiredService<ConnectionManager>());
             services.AddSingleton<PlayerManager>();
             services.AddSingleton<IPlayerManager>(opt => opt.GetRequiredService<PlayerManager>());
+            services.AddSingleton<PlayerScoreFactory>();
+            services.AddSingleton<IPlayerScoreFactory>(opt => opt.GetRequiredService<PlayerScoreFactory>());
+            services.AddSingleton<GameManager>();
+            services.AddSingleton<IGameManager>(opt => opt.GetRequiredService<GameManager>());
             services.AddViews();
             services.AddViewModels();
             services.AddViewCommands();

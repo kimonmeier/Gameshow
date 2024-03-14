@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Gameshow.Server.Configuration
+﻿namespace Gameshow.Server.Configuration
 {
     internal class ServerConfiguration
     {

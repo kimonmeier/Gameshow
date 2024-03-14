@@ -1,12 +1,9 @@
-﻿using Fleck;
-using Gameshow.Server.Configuration;
+﻿using Gameshow.Server.Configuration;
 using Gameshow.Shared.Engines;
-using Gameshow.Shared.Events.Base;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Sentry;
-using System.Text.Json;
 
 namespace Gameshow.Server.Services
 {
@@ -168,7 +165,7 @@ namespace Gameshow.Server.Services
 
         public void SendMessage(IRequest request)
         {
-            this.serviceProvider.GetRequiredService<EventQueue>().Enqueue(request);
+            serviceProvider.GetRequiredService<EventQueue>().Enqueue(request);
             
             foreach (var client in connections)
             {

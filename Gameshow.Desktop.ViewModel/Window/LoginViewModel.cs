@@ -1,7 +1,4 @@
-﻿using System.Windows.Input;
-using Gameshow.Desktop.ViewModel.Base;
-
-namespace Gameshow.Desktop.ViewModel.Window;
+﻿namespace Gameshow.Desktop.ViewModel.Window;
 
 public sealed class LoginViewModel : BindableBase
 {
@@ -11,11 +8,13 @@ public sealed class LoginViewModel : BindableBase
 
     public LoginViewModel(LoginCommand loginCommand)
     {
-        this.LoginCommand = loginCommand;
+        LoginCommand = loginCommand;
     }
 
     [Obsolete("Just for Designer")]
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public LoginViewModel()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
     }
 
@@ -49,5 +48,5 @@ public sealed class LoginViewModel : BindableBase
         }
     }
 
-    public CommandBase LoginCommand { get; }
+    public CommandBase LoginCommand { get; } = null!;
 }

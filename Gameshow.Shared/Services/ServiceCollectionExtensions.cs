@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using MediatR.Pipeline;
 
 namespace Gameshow.Shared.Services
 {
@@ -27,6 +28,7 @@ namespace Gameshow.Shared.Services
         /// <returns>Die ServiceCollection der Dependency Injection</returns>
         public static IServiceCollection AddSharedServices(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddTransient(typeof(IRequestExceptionHandler<,,>), typeof(ExceptionLoggingHandler<,,>));
             services.AddSingleton(configuration);
             services.AddSentry(configuration);
             services.AddLogging(x =>

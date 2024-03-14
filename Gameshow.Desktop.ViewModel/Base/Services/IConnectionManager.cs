@@ -1,6 +1,4 @@
-﻿using MediatR;
-
-namespace Gameshow.Desktop.ViewModel.Base.Services;
+﻿namespace Gameshow.Desktop.ViewModel.Base.Services;
 
 public interface IConnectionManager
 {

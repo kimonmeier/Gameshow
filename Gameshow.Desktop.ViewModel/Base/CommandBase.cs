@@ -1,6 +1,4 @@
-﻿using System.Windows.Input;
-
-namespace Gameshow.Desktop.ViewModel.Base;
+﻿namespace Gameshow.Desktop.ViewModel.Base;
 
 public abstract class CommandBase : ICommand
 {

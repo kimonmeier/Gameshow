@@ -10,23 +10,27 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Gameshow.Assets\Gameshow.Assets.csproj" />
       <ProjectReference Include="..\Gameshow.Desktop.ViewModel\Gameshow.Desktop.ViewModel.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Component\" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Page Include="Window\DlgLogin.xaml">
+      <Page Include="Component\PlayerDetails.xaml" />
+      <Page Include="Windows\BaseGameshowWindow.xaml" />
+      <Page Include="Windows\DlgLogin.xaml">
         <Generator>MSBuild:Compile</Generator>
         <XamlRuntime>Wpf</XamlRuntime>
         <SubType>Designer</SubType>
       </Page>
+      <Page Include="Windows\GameMasterWindow.xaml" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="MaterialDesignThemes" Version="5.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Game\" />
     </ItemGroup>
 
 </Project>

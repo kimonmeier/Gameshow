@@ -1,6 +1,4 @@
-﻿using Gameshow.Shared.Events.Base;
-
-namespace Gameshow.Server.Services;
+﻿namespace Gameshow.Server.Services;
 
 public sealed class EventQueue
 {

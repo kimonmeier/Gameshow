@@ -1,18 +1,16 @@
-﻿using System.ComponentModel;
-using System.Reflection;
-using System.Runtime.CompilerServices;
+﻿using Sentry.Protocol;
 
 namespace Gameshow.Desktop.ViewModel.Base;
 
 public abstract class BindableBase : INotifyPropertyChanged
 {
-    private List<PropertyInfo> _commandBases;
-    private MethodInfo _commandBaseRetriggerExecute;
+    private readonly List<PropertyInfo> commandBases;
+    private readonly MethodInfo commandBaseRetriggerExecute;
 
     protected BindableBase()
     {
-        _commandBases = this.GetType().GetProperties().Where(x => x.PropertyType == typeof(CommandBase)).ToList();
-        _commandBaseRetriggerExecute = typeof(CommandBase).GetMethod(nameof(CommandBase.RaiseCanExecuteChanged))!;
+        commandBases = GetType().GetProperties().Where(x => x.PropertyType == typeof(CommandBase)).ToList();
+        commandBaseRetriggerExecute = typeof(CommandBase).GetMethod(nameof(CommandBase.RaiseCanExecuteChanged))!;
     }
 
     /// <summary>
@@ -32,12 +30,12 @@ public abstract class BindableBase : INotifyPropertyChanged
     /// support CallerMemberName.</param>
     /// <returns>True if the value was changed, false if the existing value matched the
     /// desired value.</returns>
-    protected virtual bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+    protected virtual bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string? propertyName = null)
     {
-        if (object.Equals(storage, value)) return false;
+        if (Equals(storage, value)) return false;
         storage = value;
         // Log.DebugFormat("{0}.{1} = {2}", this.GetType().Name, propertyName, storage);
-        this.OnPropertyChanged(propertyName);
+        OnPropertyChanged(propertyName);
         return true;
     }
 
@@ -49,12 +47,20 @@ public abstract class BindableBase : INotifyPropertyChanged
     /// that support <see cref="CallerMemberNameAttribute"/>.</param>
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
-        var eventHandler = this.PropertyChanged;
+        if (!Application.Current.Dispatcher.CheckAccess())
+        {
+            Application.Current.Dispatcher.Invoke(delegate
+            {
+                OnPropertyChanged(propertyName);
+            });
+            return;
+        }
+        PropertyChangedEventHandler? eventHandler = PropertyChanged;
         eventHandler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         
-        foreach (PropertyInfo commandProperty in _commandBases)
+        foreach (PropertyInfo commandProperty in commandBases)
         {
-            _commandBaseRetriggerExecute.Invoke(commandProperty.GetValue(this), []);
+            commandBaseRetriggerExecute.Invoke(commandProperty.GetValue(this), []);
         }
     }
 }

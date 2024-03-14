@@ -36,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Gameshow.Assets\Gameshow.Assets.csproj" />
     <ProjectReference Include="..\Gameshow.Shared\Gameshow.Shared.csproj" />
   </ItemGroup>
 

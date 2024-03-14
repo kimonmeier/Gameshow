@@ -10,7 +10,6 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Gameshow.Desktop.ViewModel.Base.Services;
 using Websocket.Client;
 
 namespace Gameshow.Desktop.Services
@@ -82,7 +81,7 @@ namespace Gameshow.Desktop.Services
         public void Send(IRequest request)
         {
             ITransaction sentryTransaction = SentrySdk.StartTransaction("Connection", "Send");
-            BaseEvent @event = new BaseEvent()
+            BaseEvent @event = new()
             {
                 HasAnswer = false,
                 EventGuid = Guid.NewGuid(),
@@ -90,7 +89,7 @@ namespace Gameshow.Desktop.Services
                 SentryTraceHeader = sentryTransaction.GetTraceHeader().ToString(),
             };
 
-            this.connection!.Send(@event);
+            connection!.Send(@event);
             sentryTransaction.Finish();
         }
 
@@ -111,7 +110,7 @@ namespace Gameshow.Desktop.Services
             };
 
             ISpan sendDataSpan = sentryTransaction.StartChild("Send", "Sends the Data to the Server");
-            this.connection!.Send(@event);
+            connection!.Send(@event);
             sendDataSpan.Finish();
 
             ISpan waitForAnswerSpan = sentryTransaction.StartChild("Wait", "Waits for the Reply by the Server");
@@ -132,22 +131,22 @@ namespace Gameshow.Desktop.Services
 
         public void RegisterEventHandler<TRequest>(Action handler) where TRequest : IBaseRequest
         {
-            if (this.connection is null)
+            if (connection is null)
             {
-                throw new ArgumentNullException("The Connection is not yet initialised");
+                throw new ApplicationException("The Connection is not yet initialised");
             }
 
-            this.connection.RegisterEventHandler<TRequest>(handler);
+            connection.RegisterEventHandler<TRequest>(handler);
         }
 
         public void UnregisterEventHandler<TRequest>(Action handler) where TRequest : IBaseRequest
         {
-            if (this.connection is null)
+            if (connection is null)
             {
-                throw new ArgumentNullException("The Connection is not yet initialised");
+                throw new ApplicationException("The Connection is not yet initialised");
             }
 
-            this.connection.UnregisterEventHandler<TRequest>(handler);
+            connection.UnregisterEventHandler<TRequest>(handler);
         }
 
         public void Dispose()

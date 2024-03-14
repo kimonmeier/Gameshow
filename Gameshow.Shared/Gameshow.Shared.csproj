@@ -23,4 +23,10 @@
     <PackageReference Include="Sentry.NLog" Version="3.41.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Events\Game\FunWithFlags\" />
+    <Folder Include="Events\Game\GuessTheWord\" />
+    <Folder Include="Models\Player\" />
+  </ItemGroup>
+
 </Project>

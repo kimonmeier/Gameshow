@@ -16,7 +16,7 @@ namespace Gameshow.Desktop.Services
 {
     public class Connection : IDisposable
     {
-        private IWebsocketClient serverConnection;
+        private readonly IWebsocketClient serverConnection;
         private readonly ILogger<Connection> logger;
         private readonly IMediator mediator;
         private readonly List<IDisposable> disposables = new();
@@ -24,15 +24,15 @@ namespace Gameshow.Desktop.Services
 
         public Connection(ServerConfiguration configuration, ILogger<Connection> logger, IMediator mediator)
         {
-            this.serverConnection = new WebsocketClient(new Uri($"ws://{configuration.IP}:{configuration.Port}"));
+            serverConnection = new WebsocketClient(new Uri($"ws://{configuration.IP}:{configuration.Port}"));
+            handlers = new Dictionary<Type, List<Action>>();
             this.logger = logger;
             this.mediator = mediator;
-            this.handlers = new Dictionary<Type, List<Action>>();
         }
 
         public void Connect()
         {
-            disposables.Add(this.serverConnection.ReconnectionHappened.Subscribe((info) =>
+            disposables.Add(serverConnection.ReconnectionHappened.Subscribe((info) =>
             {
                 switch (info.Type)
                 {
@@ -40,111 +40,119 @@ namespace Gameshow.Desktop.Services
                         logger.LogInformation("The connection with the server is established");
                         break;
                     default:
-                        this.logger.LogWarning("The connection was lost and restored. Some Events may not be processed. Reason: {}", info.Type);
+                        logger.LogWarning("The connection was lost and restored. Some Events may not be processed. Reason: {}", info.Type);
                         break;
                 }
             }));
 
-            disposables.Add(this.serverConnection.MessageReceived.Subscribe(async (msg) =>
+            disposables.Add(serverConnection.MessageReceived.Subscribe(OnMessage));
+            serverConnection.StartOrFail().GetAwaiter().GetResult();
+        }
+
+        private async void OnMessage(ResponseMessage msg)
+        {
+            try
             {
+                if (msg.MessageType == System.Net.WebSockets.WebSocketMessageType.Binary)
+                {
+                    throw new ArgumentException("The message send by the server was not an json");
+                }
+
+                BaseEvent? @event = JsonSerializer.Deserialize<BaseEvent>(msg.Text!);
+
+                if (@event == null)
+                {
+                    throw new ArgumentException("The message send by the server was not a valid BaseEvent");
+                }
+
+                logger.LogInformation("Recieved the Event {0} from the server", @event.Request.GetType().Name);
+
+                ITransaction sentryTransaction = SentrySdk.StartTransaction("Connection", "MessageRecieved", SentryTraceHeader.Parse(@event.SentryTraceHeader));
+
                 try
                 {
-                    if (msg.MessageType == System.Net.WebSockets.WebSocketMessageType.Binary)
+                    ISpan localHandlerSpan = sentryTransaction.StartChild("Local Handler", "In this step, the local Handler are processed!");
+                    if (handlers.ContainsKey(@event.Request.GetType()))
                     {
-                        throw new ArgumentException("The message send by the server was not an json");
-                    }
+                        logger.LogInformation("Local Handlers are beeing processed");
 
-                    BaseEvent? @event = JsonSerializer.Deserialize<BaseEvent>(msg.Text!);
-
-                    if (@event == null)
-                    {
-                        throw new ArgumentException("The message send by the server was not a valid BaseEvent");
-                    }
-
-                    logger.LogInformation("Recieved the Event {0} from the server", @event.Request.GetType().Name);
-
-                    ITransaction sentryTransaction = SentrySdk.StartTransaction("Connection", "MessageRecieved", SentryTraceHeader.Parse(@event.SentryTraceHeader));
-
-                    try
-                    {
-                        ISpan localHandlerSpan = sentryTransaction.StartChild("Local Handler", "In this step, the local Handler are processed!");
-                        if (this.handlers.ContainsKey(@event.Request.GetType()))
+                        foreach (var handler in handlers[@event.Request.GetType()])
                         {
-                            logger.LogInformation("Local Handlers are beeing processed");
+                            ISpan specificHandlerSpan = localHandlerSpan.StartChild("Handler: " + handler.GetType().FullName);
+                            handler();
 
-                            foreach (var handler in this.handlers[@event.Request.GetType()])
-                            {
-                                ISpan specificHandlerSpan = localHandlerSpan.StartChild("Handler: " + handler.GetType().FullName);
-                                handler();
-
-                                specificHandlerSpan.Finish();
-                            }
-
-                            logger.LogInformation("Local Handlers were processed");
+                            specificHandlerSpan.Finish();
                         }
-                        localHandlerSpan.Finish();
 
-                        ISpan mediatrSpan = sentryTransaction.StartChild("Processing", "The Processing by the Mediator");
-                        var result = await mediator.Send(@event.Request);
-
-                        mediatrSpan.Finish();
-
-                        if (@event.HasAnswer)
-                        {
-                            ISpan answerSpan = sentryTransaction.StartChild("Answer", "The answer send to the Server");
-                            this.serverConnection.Send(JsonSerializer.Serialize(new EventAnswer() { EventGuid = @event.EventGuid, AnswerTypeFullName = (result?.GetType() ?? typeof(object)).FullName!, SentryTraceHeader = @event.SentryTraceHeader, Answer = JsonSerializer.Serialize(result) }));
-                            answerSpan.Finish();
-                        }
+                        logger.LogInformation("Local Handlers were processed");
                     }
-                    catch (Exception ex)
+
+                    localHandlerSpan.Finish();
+
+                    ISpan mediatrSpan = sentryTransaction.StartChild("Processing", "The Processing by the Mediator");
+                    var result = await mediator.Send(@event.Request);
+
+                    mediatrSpan.Finish();
+
+                    if (@event.HasAnswer)
                     {
-                        sentryTransaction.Finish(ex);
+                        ISpan answerSpan = sentryTransaction.StartChild("Answer", "The answer send to the Server");
+                        serverConnection.Send(JsonSerializer.Serialize(new EventAnswer()
+                        {
+                            EventGuid = @event.EventGuid, AnswerTypeFullName = (result?.GetType() ?? typeof(object)).FullName!, SentryTraceHeader = @event.SentryTraceHeader, Answer = JsonSerializer.Serialize(result)
+                        }));
+                        answerSpan.Finish();
                     }
-
-                    sentryTransaction.Finish();
                 }
                 catch (Exception ex)
                 {
-                    SentrySdk.CaptureException(ex);
+                    logger.LogError(ex, "An Exception occured while handling the inbound message: {}", msg.Text);
+                    sentryTransaction.Finish(ex);
                 }
-            }));
-            this.serverConnection.StartOrFail().GetAwaiter().GetResult();
+
+                sentryTransaction.Finish();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "An Exception occured while handling the inbound message: {}", msg.Text);
+                SentrySdk.CaptureException(ex);
+            }
         }
 
         public void Disconnect()
         {
             logger.LogInformation("Trying to close the established connection");
-            this.serverConnection.Stop(System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, "User requested disconnect");
+            serverConnection.Stop(System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, "User requested disconnect");
             logger.LogInformation("The established connection was closed");
         }
 
         public void Send(BaseEvent request)
         {
-            this.serverConnection.Send(JsonSerializer.Serialize(request));
+            serverConnection.Send(JsonSerializer.Serialize(request));
         }
 
         public void RegisterEventHandler<TRequest>(Action handler) where TRequest : IBaseRequest
         {
-            if (!this.handlers.ContainsKey(typeof(TRequest)))
+            if (!handlers.ContainsKey(typeof(TRequest)))
             {
-                this.handlers.Add(typeof(TRequest), new List<Action>());
+                handlers.Add(typeof(TRequest), new List<Action>());
             }
 
-            this.handlers[typeof(TRequest)].Add(handler);
+            handlers[typeof(TRequest)].Add(handler);
         }
 
         public void UnregisterEventHandler<TRequest>(Action handler) where TRequest : IBaseRequest
         {
-            if (!this.handlers.ContainsKey(typeof(TRequest)))
+            if (!handlers.ContainsKey(typeof(TRequest)))
             {
                 return;
             }
 
-            this.handlers[typeof(TRequest)].Remove(handler);
+            handlers[typeof(TRequest)].Remove(handler);
 
-            if (this.handlers[typeof(TRequest)].Count == 0)
+            if (handlers[typeof(TRequest)].Count == 0)
             {
-                this.handlers.Remove(typeof(TRequest));
+                handlers.Remove(typeof(TRequest));
             }
         }
 
@@ -155,7 +163,7 @@ namespace Gameshow.Desktop.Services
                 disposable.Dispose();
             }
 
-            this.serverConnection.Dispose();
+            serverConnection.Dispose();
         }
     }
 }

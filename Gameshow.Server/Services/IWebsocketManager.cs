@@ -1,11 +1,4 @@
-﻿using Fleck;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Gameshow.Server.Services
+﻿namespace Gameshow.Server.Services
 {
     public interface IWebsocketManager
     {
