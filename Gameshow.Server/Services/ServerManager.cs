@@ -159,7 +159,7 @@ namespace Gameshow.Server.Services
                 SentryTraceHeader = sentryTransaction.GetTraceHeader().ToString()
             };
 
-            client.Send(JsonSerializer.Serialize(@event)).ConfigureAwait(true).GetAwaiter().GetResult();
+            client.Send(JsonSerializer.Serialize(@event));
             sentryTransaction.Finish();
         }
 

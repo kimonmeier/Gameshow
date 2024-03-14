@@ -5,12 +5,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Gameshow.Desktop.View.Component"
+             xmlns:wpf="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="320" d:DesignWidth="450" Background="Transparent">
     <DockPanel LastChildFill="True">
         <Border BorderThickness="10px 10px 10px 75px" BorderBrush="Purple" Width="450px" Height="320px" CornerRadius="75 75 0 0" Background="Transparent">
             <StackPanel>
-                <WebBrowser view:WebBrowserUtil.BindableSource="{Binding Url}" Height="235px" Width="417px"></WebBrowser>
+                <wpf:ChromiumWebBrowser view:WebBrowserUtil.BindableSource="{Binding Url}" Height="235px" Width="417px"></wpf:ChromiumWebBrowser>
                 <ContentControl Margin="0px 7.5px 0px 0px" Height="60px" Content="{Binding ScoreElement}"></ContentControl>
             </StackPanel>
         </Border>

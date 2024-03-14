@@ -1,6 +1,4 @@
-﻿using Sentry.Protocol;
-
-namespace Gameshow.Desktop.ViewModel.Base;
+﻿namespace Gameshow.Desktop.ViewModel.Base;
 
 public abstract class BindableBase : INotifyPropertyChanged
 {

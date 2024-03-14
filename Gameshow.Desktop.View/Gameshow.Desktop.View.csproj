@@ -26,6 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="CefSharp.Wpf.NETCore" Version="122.1.120" />
       <PackageReference Include="MaterialDesignThemes" Version="5.0.0" />
     </ItemGroup>
 

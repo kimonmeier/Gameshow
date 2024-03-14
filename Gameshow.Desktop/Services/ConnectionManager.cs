@@ -93,7 +93,7 @@ namespace Gameshow.Desktop.Services
             sentryTransaction.Finish();
         }
 
-        public TAnswer Send<TAnswer>(IRequest<TAnswer> request) where TAnswer : new()
+        public async Task<TAnswer> Send<TAnswer>(IRequest<TAnswer> request) where TAnswer : new()
         {
             Guid eventGuid = Guid.NewGuid();
             TaskCompletionSource<dynamic> completionSource = new();
@@ -116,7 +116,7 @@ namespace Gameshow.Desktop.Services
             ISpan waitForAnswerSpan = sentryTransaction.StartChild("Wait", "Waits for the Reply by the Server");
             try
             {
-                return (TAnswer)completionSource.Task.ConfigureAwait(true).GetAwaiter().GetResult();
+                return await completionSource.Task;
             } finally
             {
                 waitForAnswerSpan.Finish();

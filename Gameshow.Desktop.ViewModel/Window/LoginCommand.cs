@@ -1,6 +1,6 @@
 ﻿namespace Gameshow.Desktop.ViewModel.Window;
 
-public sealed class LoginCommand : CommandBase
+public sealed class LoginCommand : AsyncCommand
 {
     private readonly IConnectionManager connectionManager;
     private readonly IPlayerManager playerManager;
@@ -13,7 +13,7 @@ public sealed class LoginCommand : CommandBase
         this.gameManager = gameManager;
     }
 
-    public override bool CanExecute(object? parameter)
+    protected override bool ShouldExecute(object? parameter)
     {
         if (parameter is not LoginViewModel vmLogin)
         {
@@ -28,7 +28,7 @@ public sealed class LoginCommand : CommandBase
         return !string.IsNullOrWhiteSpace(vmLogin.Link) && !string.IsNullOrWhiteSpace(vmLogin.Name) && vmLogin.Disconnected;
     }
 
-    public override void Execute(object? parameter)
+    protected async override Task ExecuteAsync(object? parameter)
     {
         if (parameter is not LoginViewModel vmLogin)
         {
@@ -47,7 +47,7 @@ public sealed class LoginCommand : CommandBase
                 Type = gameManager.PlayerType
             };
             
-            playerManager.PlayerId = connectionManager.Send(@event);
+            playerManager.PlayerId = await connectionManager.Send(@event);
         }
     }
 }

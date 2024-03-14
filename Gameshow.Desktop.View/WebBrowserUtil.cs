@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using CefSharp.Wpf;
 
 namespace Gameshow.Desktop.View;
 
@@ -20,12 +21,12 @@ public class WebBrowserUtil
 
     private static void BindableSourcePropertyChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
     {
-        if (o is not WebBrowser browser)
+        if (o is not ChromiumWebBrowser browser)
         {
             return;
         }
         
         string? uri = e.NewValue as string;
-        browser.Source = !string.IsNullOrEmpty(uri) ? new Uri(uri) : null;
+        browser.Address = !string.IsNullOrEmpty(uri) ? uri : null;
     }
 }

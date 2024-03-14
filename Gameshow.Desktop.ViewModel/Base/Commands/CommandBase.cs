@@ -1,4 +1,4 @@
-﻿namespace Gameshow.Desktop.ViewModel.Base;
+﻿namespace Gameshow.Desktop.ViewModel.Base.Commands;
 
 public abstract class CommandBase : ICommand
 {
