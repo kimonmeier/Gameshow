@@ -3,4 +3,6 @@
 public interface IGameManager
 {
     PlayerType PlayerType { get; }
+    
+    GameState GameState { get; }
 }

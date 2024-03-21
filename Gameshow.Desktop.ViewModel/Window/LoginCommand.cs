@@ -1,6 +1,6 @@
 ﻿namespace Gameshow.Desktop.ViewModel.Window;
 
-public sealed class LoginCommand : AsyncCommand
+public sealed class LoginCommand : AsyncTypeSafeCommand<LoginViewModel>
 {
     private readonly IConnectionManager connectionManager;
     private readonly IPlayerManager playerManager;
@@ -13,41 +13,33 @@ public sealed class LoginCommand : AsyncCommand
         this.gameManager = gameManager;
     }
 
-    protected override bool ShouldExecute(object? parameter)
+    protected override bool ShouldExecute(LoginViewModel parameter)
     {
-        if (parameter is not LoginViewModel vmLogin)
-        {
-            return false;
-        }
-
         if (gameManager.PlayerType != PlayerType.Player)
         {
             return true;
         }
 
-        return !string.IsNullOrWhiteSpace(vmLogin.Link) && !string.IsNullOrWhiteSpace(vmLogin.Name) && vmLogin.Disconnected;
+        return !string.IsNullOrWhiteSpace(parameter.Link) && !string.IsNullOrWhiteSpace(parameter.Name) && parameter.Disconnected;
     }
 
-    protected async override Task ExecuteAsync(object? parameter)
+    protected async override Task ExecuteAsync(LoginViewModel parameter)
     {
-        if (parameter is not LoginViewModel vmLogin)
-        {
-            return;
-        }
-
         bool connected = connectionManager.Connect();
-        vmLogin.Disconnected = !connected;
+        parameter.Disconnected = !connected;
 
         if (connected)
         {
             PlayerConnectingEvent @event = new()
             {
-                Name = vmLogin.Name!,
-                Link = vmLogin.Link!,
+                Name = parameter.Name!,
+                Link = parameter.Link!,
                 Type = gameManager.PlayerType
             };
             
             playerManager.PlayerId = await connectionManager.Send(@event);
+            
+            parameter.CloseAction.Invoke();
         }
     }
 }

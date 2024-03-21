@@ -1,4 +1,7 @@
-﻿using Gameshow.Desktop.Services;
+﻿using System.IO;
+using CefSharp;
+using CefSharp.Wpf;
+using Gameshow.Desktop.Services;
 using Gameshow.Desktop.View.Windows;
 using Gameshow.Shared.Configuration;
 using Gameshow.Shared.Events.Player.Enums;
@@ -15,6 +18,13 @@ public partial class App : Application
 
     void App_Startup(object sender, StartupEventArgs e)
     {
+#if DEBUG
+        Cef.Initialize(new CefSettings()
+        {
+            CachePath = Path.Combine(Environment.CurrentDirectory, "CefSharp", "Cache", Guid.NewGuid().ToString()), WindowlessRenderingEnabled = true
+        });
+#endif
+
         Logger logger = LogManager.GetCurrentClassLogger();
         logger.Info("Application is starting up!");
 
@@ -45,27 +55,16 @@ public partial class App : Application
 
         try
         {
-            DispatcherUnhandledException += (_, unhandledExceptionEventArgs) =>
+            AppDomain.CurrentDomain.UnhandledException += (_, unhandledExceptionEventArgs) =>
+            {
+                logger.Error((Exception)unhandledExceptionEventArgs.ExceptionObject, "During the application loop, an uncatched exception occured!");
+            };
+            Current.Dispatcher.UnhandledException += (_, unhandledExceptionEventArgs) =>
             {
                 logger.Error(unhandledExceptionEventArgs.Exception, "During the application loop, an uncatched exception occured!");
             };
 
-            if (gameManager.PlayerType == PlayerType.Player)
-            {
-
-                DlgLogin login = serviceProvider.GetRequiredService<DlgLogin>();
-
-                logger.Info("The login screen is starting");
-                login.ShowDialog();
-
-                if (!(login.DialogResult ?? false))
-                {
-                    return;
-                }
-
-
-            }
-            else
+            if (gameManager.PlayerType != PlayerType.Player)
             {
                 ConnectionManager connectionManager = serviceProvider.GetRequiredService<ConnectionManager>();
                 connectionManager.Connect();
@@ -78,13 +77,18 @@ public partial class App : Application
             BaseGameshowWindow gameshowWindow = serviceProvider.GetRequiredService<BaseGameshowWindow>();
             gameshowWindow.Show();
 
-            if (gameManager.PlayerType != PlayerType.GameMaster)
+            if (gameManager.PlayerType == PlayerType.GameMaster)
             {
-                return;
+                GameMasterWindow gameMasterWindow = serviceProvider.GetRequiredService<GameMasterWindow>();
+                gameMasterWindow.Show();
             }
+            else if (gameManager.PlayerType == PlayerType.Player)
+            {
+                DlgLogin login = serviceProvider.GetRequiredService<DlgLogin>();
 
-            GameMasterWindow gameMasterWindow = serviceProvider.GetRequiredService<GameMasterWindow>();
-            gameMasterWindow.Show();
+                logger.Info("The login screen is starting");
+                login.ShowDialog();
+            }
         }
         catch (Exception ex)
         {

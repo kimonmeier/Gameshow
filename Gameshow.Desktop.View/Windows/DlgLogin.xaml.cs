@@ -6,5 +6,7 @@ public partial class DlgLogin
     {
         InitializeComponent();
         DataContext = loginViewModel;
+
+        loginViewModel.CloseAction = Close;
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Gameshow.Desktop.ViewModel.Base.Commands;
 
-public abstract class CommandBase : ICommand
+public abstract class CommandBase: ICommand
 {
     public void RaiseCanExecuteChanged()
     {

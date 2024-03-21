@@ -14,6 +14,7 @@ public static class ConfigureServices
     public static IServiceCollection AddViewCommands(this IServiceCollection services)
     {
         services.AddTransient<LoginCommand>();
+        services.AddTransient<GameshowBuzzerPressedCommand>();
 
         return services;
     }

@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:Gameshow.Desktop.View.Windows"
         mc:Ignorable="d"
         WindowState="Maximized"
-        Title="BaseGameshowWindow" d:DesignHeight="1080" d:DesignWidth="1920">
+        Title="BaseGameshowWindow" d:DesignHeight="1080" d:DesignWidth="1920"
+        Loaded="BaseGameshowWindow_OnLoaded">
     <Window.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
             <GradientStop Color="MediumPurple" Offset="0" />

@@ -21,6 +21,8 @@ namespace Gameshow.Desktop
             services.AddSingleton<IPlayerScoreFactory>(opt => opt.GetRequiredService<PlayerScoreFactory>());
             services.AddSingleton<GameManager>();
             services.AddSingleton<IGameManager>(opt => opt.GetRequiredService<GameManager>());
+            services.AddSingleton<ScoreManager>();
+            services.AddSingleton<IScoreManager>(opt => opt.GetRequiredService<ScoreManager>());
             services.AddViews();
             services.AddViewModels();
             services.AddViewCommands();

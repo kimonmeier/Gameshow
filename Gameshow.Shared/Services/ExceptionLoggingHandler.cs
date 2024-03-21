@@ -18,10 +18,6 @@ public class ExceptionLoggingHandler<TRequest, TResponse, TException> : IRequest
     {
         _logger.LogError(exception, "Something went wrong while handling request of type {@requestType}", typeof(TRequest));
 
-        // TODO: when we want to show the user somethig went wrong, we need to expand this with something like
-        // a ResponseBase where we wrap the actual response and return an indication whether the call was successful or not.
-        state.SetHandled(default!);
-
         return Task.CompletedTask;
     }
 }

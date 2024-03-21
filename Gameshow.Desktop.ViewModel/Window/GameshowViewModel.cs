@@ -6,6 +6,18 @@ public sealed class GameshowViewModel : BindableBase
     private UIElement? playerInfo2;
     private UIElement? currentView;
 
+    public GameshowViewModel(GameshowBuzzerPressedCommand gameshowBuzzerPressedCommand)
+    {
+        BuzzerPressedCommand = gameshowBuzzerPressedCommand;
+    }
+
+    [Obsolete("Just for Designer")]
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    public GameshowViewModel()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    {
+    }
+    
     public UIElement? PlayerInfo1
     {
         get => playerInfo1;
@@ -35,4 +47,6 @@ public sealed class GameshowViewModel : BindableBase
             OnPropertyChanged();
         }
     }
+    
+    public CommandBase BuzzerPressedCommand { get; }
 }

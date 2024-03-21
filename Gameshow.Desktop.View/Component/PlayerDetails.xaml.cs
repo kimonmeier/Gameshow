@@ -4,7 +4,14 @@ public partial class PlayerDetails
 {
     public PlayerDetails(PlayerDetailsModel playerDetailsModel)
     {
-        InitializeComponent();
+        try
+        {
+            InitializeComponent();
+        }
+        catch (Exception e)
+        {
+            
+        };
         DataContext = playerDetailsModel;
     }
 

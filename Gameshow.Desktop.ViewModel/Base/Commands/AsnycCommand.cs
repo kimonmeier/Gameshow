@@ -2,25 +2,25 @@
 
 namespace Gameshow.Desktop.ViewModel.Base.Commands;
 
-public abstract class AsyncCommand : CommandBase
+public abstract class AsyncTypeSafeCommand<T> : TypeSafeCommandBase<T> where T : BindableBase
 {
     private bool isExecuting;
 
-    public override bool CanExecute(object? parameter)
+    protected override bool CanExecute(T parameter)
     {
         return !isExecuting && ShouldExecute(parameter);
     }
 
-    public override void Execute(object? parameter)
+    protected override void Execute(T parameter)
     {
         ContinueAsync(parameter).SafeFireAndForget();
     }
 
-    protected abstract bool ShouldExecute(object? parameter);
+    protected abstract bool ShouldExecute(T parameter);
 
-    protected abstract Task ExecuteAsync(object? parameter);
+    protected abstract Task ExecuteAsync(T parameter);
 
-    private async Task ContinueAsync(object? parameter)
+    private async Task ContinueAsync(T? parameter)
     {
         if (ShouldExecute(parameter))
         {

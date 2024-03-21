@@ -2,6 +2,7 @@
 
 global using System.Windows;
 global using Gameshow.Desktop.View.Component;
+global using Gameshow.Desktop.ViewModel.Base;
 global using Gameshow.Desktop.ViewModel.Base.Services;
 global using Gameshow.Desktop.ViewModel.Component;
 global using Gameshow.Desktop.ViewModel.Models;

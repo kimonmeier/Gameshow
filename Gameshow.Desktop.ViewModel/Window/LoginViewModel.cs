@@ -47,6 +47,8 @@ public sealed class LoginViewModel : BindableBase
             OnPropertyChanged();
         }
     }
+    
+    public Action CloseAction { get; set; }
 
     public CommandBase LoginCommand { get; } = null!;
 }
