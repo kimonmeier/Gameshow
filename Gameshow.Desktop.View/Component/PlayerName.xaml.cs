@@ -1,16 +1,16 @@
-﻿using System.Windows.Controls;
+﻿using Gameshow.Desktop.ViewModel.Component.Player;
 
 namespace Gameshow.Desktop.View.Component;
 
-public partial class PlayerBuzzer : UserControl
+public partial class PlayerName : UserControl
 {
-    public PlayerBuzzer(PlayerBuzzerModel model)
+    public PlayerName(PlayerNameModel model)
     {
         this.DataContext = model;
     }
     
     [Obsolete("Just for Designer")]
-    public PlayerBuzzer()
+    public PlayerName()
     {
         InitializeComponent();
     }

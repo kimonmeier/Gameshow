@@ -1,7 +1,4 @@
-﻿using Gameshow.Desktop.ViewModel.Base;
-using Gameshow.Desktop.ViewModel.Base.Services;
-
-namespace Gameshow.Desktop.ViewModel.Component;
+﻿namespace Gameshow.Desktop.ViewModel.Component.Player;
 
 public sealed class PlayerDetailsModel : BindableBase
 {
@@ -9,9 +6,10 @@ public sealed class PlayerDetailsModel : BindableBase
     private string? url;
     private ScoreType scoreType;
     private UIElement? scoreElement;
-    private Guid? playerGuid;
+    private bool isBuzzerPressed;
 
     private readonly IPlayerScoreFactory playerDetailsFactory;
+    private readonly Guid? playerGuid;
 
     public PlayerDetailsModel(IPlayerScoreFactory playerDetailsFactory, PlayerInformation playerInformation)
     {
@@ -66,6 +64,19 @@ public sealed class PlayerDetailsModel : BindableBase
         set
         {
             scoreElement = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsBuzzerPressed
+    {
+        get => isBuzzerPressed;
+        set
+        {
+            if (value == isBuzzerPressed)
+                return;
+
+            isBuzzerPressed = value;
             OnPropertyChanged();
         }
     }

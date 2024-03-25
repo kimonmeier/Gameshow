@@ -7,6 +7,10 @@ public static class ConfigureServices
         services.AddScoped<LoginViewModel>();
         services.AddScoped<PlayerDetailsModel>();
         services.AddScoped<GameshowViewModel>();
+        services.AddScoped<BuzzerInfoViewModel>();
+        services.AddScoped<ConnectionInfoViewModel>();
+        services.AddScoped<GeneralInfoViewModel>();
+        services.AddScoped<GameMasterViewModel>();
 
         return services;
     }
@@ -15,6 +19,7 @@ public static class ConfigureServices
     {
         services.AddTransient<LoginCommand>();
         services.AddTransient<GameshowBuzzerPressedCommand>();
+        services.AddTransient<ConnectionInfoLoginCommand>();
 
         return services;
     }

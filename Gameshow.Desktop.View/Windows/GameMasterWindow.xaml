@@ -5,9 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:Gameshow.Desktop.View.Windows"
+        xmlns:gameMaster="clr-namespace:Gameshow.Desktop.View.Component.GameMaster"
         mc:Ignorable="d"
         Title="GameMasterWindow" Height="450" Width="800">
     <TabControl>
+        <TabItem Header="General">
+            <ContentControl Content="{Binding Path=GeneralInfoView}" />
+        </TabItem>
         
         
     </TabControl>

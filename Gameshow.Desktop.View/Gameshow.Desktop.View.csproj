@@ -15,7 +15,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Page Include="Component\PlayerBuzzer.xaml" />
+      <Page Include="Component\GameMaster\GeneralInfo.xaml" />
+      <Page Include="Component\GameMaster\General\BuzzerInfo.xaml" />
+      <Page Include="Component\GameMaster\General\ConnectionInfo.xaml" />
+      <Page Include="Component\PlayerName.xaml" />
       <Page Include="Component\PlayerDetails.xaml" />
       <Page Include="Windows\BaseGameshowWindow.xaml" />
       <Page Include="Windows\DlgLogin.xaml">

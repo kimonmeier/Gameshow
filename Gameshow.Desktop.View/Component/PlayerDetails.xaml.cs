@@ -1,17 +1,12 @@
-﻿namespace Gameshow.Desktop.View.Component;
+﻿using Gameshow.Desktop.ViewModel.Component.Player;
+
+namespace Gameshow.Desktop.View.Component;
 
 public partial class PlayerDetails
 {
     public PlayerDetails(PlayerDetailsModel playerDetailsModel)
     {
-        try
-        {
-            InitializeComponent();
-        }
-        catch (Exception e)
-        {
-            
-        };
+        InitializeComponent();
         DataContext = playerDetailsModel;
     }
 

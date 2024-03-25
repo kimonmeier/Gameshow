@@ -1,4 +1,6 @@
-﻿namespace Gameshow.Desktop.ViewModel.Base;
+﻿using System.Windows.Controls;
+
+namespace Gameshow.Desktop.ViewModel.Base;
 
 public abstract class BindableBase : INotifyPropertyChanged
 {
@@ -7,7 +9,7 @@ public abstract class BindableBase : INotifyPropertyChanged
 
     protected BindableBase()
     {
-        commandBases = GetType().GetProperties().Where(x => x.PropertyType == typeof(CommandBase)).ToList();
+        commandBases = GetType().GetProperties().Where(x => x.PropertyType == typeof(CommandBase) || x.PropertyType == typeof(UIElement)).ToList();
         commandBaseRetriggerExecute = typeof(CommandBase).GetMethod(nameof(CommandBase.RaiseCanExecuteChanged))!;
     }
 
@@ -56,9 +58,31 @@ public abstract class BindableBase : INotifyPropertyChanged
         PropertyChangedEventHandler? eventHandler = PropertyChanged;
         eventHandler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         
+        CallCommandsRecursive();
+    }
+
+    protected void CallCommandsRecursive()
+    {
         foreach (PropertyInfo commandProperty in commandBases)
         {
-            commandBaseRetriggerExecute.Invoke(commandProperty.GetValue(this), []);
+            SearchRecursive(commandProperty, this);
         }
+    }
+
+    public void SearchRecursive(PropertyInfo propertyInfo, object? value)
+    {
+        if (propertyInfo.PropertyType == typeof(CommandBase))
+        {
+            commandBaseRetriggerExecute.Invoke(propertyInfo.GetValue(this), []);
+            return;
+        }
+        
+        UserControl? userControl = propertyInfo.GetValue(value) as UserControl;
+        if (userControl?.DataContext is not BindableBase bindableBase)
+        {
+            return;
+        }
+
+        bindableBase.CallCommandsRecursive();
     }
 }

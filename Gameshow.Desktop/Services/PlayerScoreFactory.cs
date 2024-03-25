@@ -18,6 +18,11 @@ public sealed class PlayerScoreFactory : IPlayerScoreFactory
         return playerElements.GetValueOrDefault(playerId ?? Guid.Empty)?.GetValueOrDefault(scoreType);
     }
 
+    public PlayerDetailsModel GetDetailsModel(Guid playerId)
+    {
+        return (PlayerDetailsModel)playerDetails[playerId].DataContext;
+    }
+
     public void RegisterPlayer(PlayerInformation playerInformation)
     {
         Application.Current.Dispatcher.Invoke(delegate
@@ -71,21 +76,22 @@ public sealed class PlayerScoreFactory : IPlayerScoreFactory
     private Dictionary<ScoreType, UIElement?> CreateDefaultPlayer(PlayerInformation player)
     {
         Dictionary<ScoreType, UIElement?> elements = new();
-        
-        elements.Add(ScoreType.None, null);
 
         #region Buzzer
         
-        PlayerBuzzerModel playerBuzzerModel = new()
+        PlayerNameModel playerNameModel = new()
         {
-            PlayerUid = player.PlayerId,
+            PlayerId = player.PlayerId,
             PlayerName = player.Name,
-            IsPressed = false
         };
-        PlayerBuzzer playerBuzzer = new(playerBuzzerModel);
-        scoreManager.RegisterModel(player.PlayerId, ScoreType.Buzzer, playerBuzzerModel);
+        PlayerName playerNameView = new(playerNameModel);
+        scoreManager.RegisterModel(player.PlayerId, ScoreType.None, playerNameModel);
         
-        elements.Add(ScoreType.Buzzer, playerBuzzer);
+        elements.Add(ScoreType.None, playerNameView);
+        
+        #endregion
+        
+        #region 
         
         #endregion
 

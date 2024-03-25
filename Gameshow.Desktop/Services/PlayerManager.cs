@@ -3,17 +3,31 @@
 public sealed class PlayerManager : IPlayerManager
 {
     private readonly List<PlayerInformation> opponents;
-    private readonly IPlayerScoreFactory playerScoreFactory;
+    private readonly PlayerScoreFactory playerScoreFactory;
     
     public Guid PlayerId { get; set; }
     public IReadOnlyList<PlayerInformation> Opponents => opponents.AsReadOnly();
 
-    public PlayerManager(IPlayerScoreFactory playerScoreFactory)
+    public PlayerManager(PlayerScoreFactory playerScoreFactory)
     {
         this.playerScoreFactory = playerScoreFactory;
         opponents = new List<PlayerInformation>();
     }
-    
+
+    public IEnumerable<Guid> Players {
+        get
+        {
+            Guid[] playerIds = new Guid[opponents.Count + 1];
+            playerIds[0] = PlayerId;
+            for (int i = 0; i < opponents.Count; i++)
+            {
+                playerIds[i + 1] = opponents[i].PlayerId;
+            }
+
+            return playerIds;
+        }
+    }
+
     public void RegisterPlayer(Guid playerGuid, string name, string link)
     {
         PlayerInformation playerInformation = new PlayerInformation()

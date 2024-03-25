@@ -2,23 +2,21 @@
 
 public sealed class GameshowBuzzerPressedCommand : AsyncTypeSafeCommand<GameshowViewModel>
 {
-    private readonly IGameManager gameManager;
-    private readonly IConnectionManager connectionManager;
+    private readonly IBuzzerManager buzzerManager;
 
-    public GameshowBuzzerPressedCommand(IGameManager gameManager, IConnectionManager connectionManager)
+    public GameshowBuzzerPressedCommand(IBuzzerManager buzzerManager)
     {
-        this.gameManager = gameManager;
-        this.connectionManager = connectionManager;
+        this.buzzerManager = buzzerManager;
     }
 
     protected override bool ShouldExecute(GameshowViewModel parameter)
     {
-        return gameManager.GameState == GameState.InGame;
+        return !buzzerManager.IsLocked;
     }
 
     protected override Task ExecuteAsync(GameshowViewModel parameter)
     {
-        connectionManager.Send(new BuzzerPressedEvent());
+        buzzerManager.BuzzerPressed();
 
         return Task.CompletedTask;
     }

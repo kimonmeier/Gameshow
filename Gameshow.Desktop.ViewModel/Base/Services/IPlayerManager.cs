@@ -3,6 +3,8 @@
 public interface IPlayerManager
 {
     Guid PlayerId { get; set; }
+    
+    IEnumerable<Guid> Players { get; }
 
     void RegisterPlayer(Guid playerGuid, string name, string link);
 

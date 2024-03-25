@@ -1,4 +1,5 @@
-﻿using Gameshow.Shared.Events.Player.Enums;
+﻿using System.Diagnostics;
+using Gameshow.Shared.Events.Player.Enums;
 
 namespace Gameshow.Server.Events.Player;
 
@@ -29,6 +30,8 @@ public sealed class PlayerConnectingEventHandler : IRequestHandler<PlayerConnect
         Guid playerId;
         if (request.Type == PlayerType.Player)
         {
+            Debug.Assert(request.Name != null, "request.Name != null");
+            Debug.Assert(request.Link != null, "request.Link != null");
             playerId = playerManager.RegisterPlayer(client, request.Name, request.Link);
         }
         else

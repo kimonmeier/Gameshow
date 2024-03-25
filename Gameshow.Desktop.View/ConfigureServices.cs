@@ -8,6 +8,9 @@ public static class ConfigureServices
         services.AddScoped<BaseGameshowWindow>();
         services.AddScoped<GameMasterWindow>();
         services.AddScoped<PlayerDetails>();
+        services.AddScoped<GeneralInfo>();
+        services.AddScoped<BuzzerInfo>();
+        services.AddScoped<ConnectionInfo>();
 
         return services;
     }

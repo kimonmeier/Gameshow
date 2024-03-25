@@ -1,6 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using CefSharp.Wpf;
+﻿using CefSharp.Wpf;
 
 namespace Gameshow.Desktop.View;
 

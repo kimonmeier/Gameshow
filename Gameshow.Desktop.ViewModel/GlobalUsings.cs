@@ -9,6 +9,8 @@ global using Gameshow.Desktop.ViewModel.Base;
 global using Gameshow.Desktop.ViewModel.Base.Commands;
 global using Gameshow.Desktop.ViewModel.Base.Services;
 global using Gameshow.Desktop.ViewModel.Component;
+global using Gameshow.Desktop.ViewModel.Component.GameMaster.General;
+global using Gameshow.Desktop.ViewModel.Component.Player;
 global using Gameshow.Desktop.ViewModel.Models;
 global using Gameshow.Desktop.ViewModel.Window;
 global using Gameshow.Shared.Events.Game.Base;

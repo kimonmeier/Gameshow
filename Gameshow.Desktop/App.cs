@@ -64,7 +64,7 @@ public partial class App : Application
                 logger.Error(unhandledExceptionEventArgs.Exception, "During the application loop, an uncatched exception occured!");
             };
 
-            if (gameManager.PlayerType != PlayerType.Player)
+            if (gameManager.PlayerType == PlayerType.Spectator)
             {
                 ConnectionManager connectionManager = serviceProvider.GetRequiredService<ConnectionManager>();
                 connectionManager.Connect();

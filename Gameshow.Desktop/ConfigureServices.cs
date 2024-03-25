@@ -23,6 +23,8 @@ namespace Gameshow.Desktop
             services.AddSingleton<IGameManager>(opt => opt.GetRequiredService<GameManager>());
             services.AddSingleton<ScoreManager>();
             services.AddSingleton<IScoreManager>(opt => opt.GetRequiredService<ScoreManager>());
+            services.AddSingleton<BuzzerManager>();
+            services.AddSingleton<IBuzzerManager>(opt => opt.GetRequiredService<BuzzerManager>());
             services.AddViews();
             services.AddViewModels();
             services.AddViewCommands();

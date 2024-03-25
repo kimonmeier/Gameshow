@@ -17,5 +17,4 @@ public enum ScoreType : int
     /// 
     /// </summary>
     LimitedPoints,
-    Buzzer,
 }
