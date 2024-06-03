@@ -1,4 +1,6 @@
-﻿namespace Gameshow.Desktop.Events.Game.Base;
+﻿using Gameshow.Desktop.View.Component.GameMaster.General;
+
+namespace Gameshow.Desktop.Events.Game.Base;
 
 public sealed class BuzzerPressedEventHandler : IRequestHandler<BuzzerPressedEvent>
 {

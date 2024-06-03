@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Gameshow.Desktop.ViewModel.Component.GameMaster.General;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Gameshow.Desktop.Services;
 
@@ -6,8 +7,11 @@ public sealed class BuzzerManager : IBuzzerManager
 {
     public bool IsLocked { get; private set; } = true;
 
+    public Guid? PlayerBuzzed { get; private set; }
+
     private readonly ConnectionManager connectionManager;
     private readonly IServiceProvider serviceProvider;
+    private BuzzerInfoViewModel? buzzerInfoViewModel;
     private IPlayerManager? playerManager;
     private IPlayerScoreFactory? playerScoreFactory;
 
@@ -23,7 +27,7 @@ public sealed class BuzzerManager : IBuzzerManager
             return playerManager;
         }
     }
-    
+
     private IPlayerScoreFactory PlayerScoreFactory
     {
         get
@@ -37,6 +41,19 @@ public sealed class BuzzerManager : IBuzzerManager
         }
     }
 
+    private BuzzerInfoViewModel BuzzerInfoViewModel
+    {
+        get
+        {
+            if (buzzerInfoViewModel == null)
+            {
+                buzzerInfoViewModel = serviceProvider.GetRequiredService<BuzzerInfoViewModel>();
+            }
+
+            return buzzerInfoViewModel;
+        }
+    }
+
     public BuzzerManager(ConnectionManager connectionManager, IServiceProvider serviceProvider)
     {
         this.connectionManager = connectionManager;
@@ -46,11 +63,16 @@ public sealed class BuzzerManager : IBuzzerManager
     public void ResetBuzzer()
     {
         IsLocked = false;
-
-        foreach (Guid playerId in PlayerManager.Players)
+        PlayerBuzzed = null;
+        Application.Current.Dispatcher.Invoke(delegate
         {
-            PlayerScoreFactory.GetDetailsModel(playerId).IsBuzzerPressed = false;
-        }
+            foreach (Guid playerId in PlayerManager.Players)
+            {
+                PlayerScoreFactory.GetDetailsModel(playerId).IsBuzzerPressed = false;
+            }
+
+            BuzzerInfoViewModel.TellUiToUpdate();
+        });
     }
 
     public void BuzzerPressed()
@@ -63,6 +85,12 @@ public sealed class BuzzerManager : IBuzzerManager
 
     public void SetPlayerBuzzed(Guid playerId)
     {
-        PlayerScoreFactory.GetDetailsModel(playerId).IsBuzzerPressed = true;
+        Application.Current.Dispatcher.Invoke(delegate
+        {
+            PlayerScoreFactory.GetDetailsModel(playerId).IsBuzzerPressed = true;
+            PlayerBuzzed = playerId;
+        });
+
+        BuzzerInfoViewModel.TellUiToUpdate();
     }
 }

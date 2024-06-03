@@ -2,7 +2,8 @@
 
 public interface IBuzzerManager
 {
-    public bool IsLocked { get; }
+    public bool IsLocked { get; }    
+    public Guid? PlayerBuzzed { get; }
     
     void ResetBuzzer();
 

@@ -17,6 +17,11 @@ public sealed class PlayerManager : IPlayerManager
     public IEnumerable<Guid> Players {
         get
         {
+            if (PlayerId == Guid.Empty)
+            {
+                return opponents.Select(x => x.PlayerId);
+            }
+            
             Guid[] playerIds = new Guid[opponents.Count + 1];
             playerIds[0] = PlayerId;
             for (int i = 0; i < opponents.Count; i++)

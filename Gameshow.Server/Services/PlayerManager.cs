@@ -77,7 +77,7 @@ public sealed class PlayerManager
         return Players.SingleOrDefault(x => x.Value.Client.ConnectionInfo.Id == client.ConnectionInfo.Id).Key;
     }
 
-    public bool IsPlaer(IWebSocketConnection client)
+    public bool IsPlayer(IWebSocketConnection client)
     {
         return Players.ContainsKey(GetPlayerIdByClient(client));
     }

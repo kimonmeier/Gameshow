@@ -5,11 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Gameshow.Desktop.View.Component.GameMaster.General"
              mc:Ignorable="d"
-             Height="100px"
+             Height="200px"
              Width="200px">
     <GroupBox Header="Verbindungsinformation" Padding="10px">
         <StackPanel>
-            <Label Content="{Binding Path=ConnectionInfoView}"></Label>
+            <Label Foreground="Black" Content="{Binding Path=ConnectionInfo}"></Label>
             <Button Margin="0px 10px" Command="{Binding Path=LoginCommand}" CommandParameter="{Binding .}">
                 Verbinden!
             </Button>

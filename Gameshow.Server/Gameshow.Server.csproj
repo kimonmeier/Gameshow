@@ -50,7 +50,6 @@
     <Folder Include="Database\Migrations\" />
     <Folder Include="Database\Configurations\" />
     <Folder Include="Database\Entities\" />
-    <Folder Include="Events\Game\" />
   </ItemGroup>
 
 </Project>

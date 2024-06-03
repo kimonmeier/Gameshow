@@ -12,5 +12,6 @@ global using System.Threading.Tasks;
 global using Fleck;
 global using Gameshow.Server.Services;
 global using Gameshow.Shared.Events.Base;
+global using Gameshow.Shared.Events.Game.Base;
 global using Gameshow.Shared.Events.Player;
 global using MediatR;

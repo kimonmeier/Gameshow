@@ -9,35 +9,15 @@
              mc:Ignorable="d"
              d:DesignHeight="320" d:DesignWidth="450" Background="Transparent">
     <DockPanel LastChildFill="True">
-        <Border x:Name="Border1" BorderThickness="10px 10px 10px 75px" Width="450px" Height="320px" CornerRadius="75 75 0 0" Background="Transparent">
+        <Border BorderThickness="10px 10px 10px 75px" Width="450px" Height="320px" CornerRadius="75 75 0 0" Background="Black">
             <Border.BorderBrush>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop x:Name="GradientStop1" Color="Purple" Offset="0" />
-                    <GradientStop x:Name="GradientStop2" Color="MediumVioletRed" Offset="1" />
+                    <GradientStop Color="Purple" Offset="0" />
+                    <GradientStop Color="MediumVioletRed" Offset="1" />
                 </LinearGradientBrush>
             </Border.BorderBrush>
-            <Border.Triggers>
-                <DataTrigger Binding="{Binding IsBuzzerPressed}" Value="True">
-                    <DataTrigger.EnterActions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation 
-                                    Storyboard.TargetName="GradientStop1"
-                                    Storyboard.TargetProperty="Offset"
-                                    From="0.0" To="1.0" Duration="0:0:1.5"
-                                    AutoReverse="True" />
-                                <DoubleAnimation 
-                                    Storyboard.TargetName="GradientStop2"
-                                    Storyboard.TargetProperty="Offset"
-                                    From="1.0" To="0.0" Duration="0:0:1.5"
-                                    AutoReverse="True" />
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </DataTrigger.EnterActions>
-                </DataTrigger>
-            </Border.Triggers>
             <StackPanel>
-                <wpf:ChromiumWebBrowser view:WebBrowserUtil.BindableSource="{Binding Url}" Height="235px" Width="417px"></wpf:ChromiumWebBrowser>
+                <wpf:ChromiumWebBrowser ClipToBounds="True" view:WebBrowserUtil.BindableSource="{Binding Url}" Height="235px" Width="417px"></wpf:ChromiumWebBrowser>
                 <ContentControl Margin="0px 242.5px 0px 0px" Height="60px" Width="417px" Content="{Binding ScoreElement}"></ContentControl>
             </StackPanel>
         </Border>

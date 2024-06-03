@@ -20,6 +20,7 @@ public static class ConfigureServices
         services.AddTransient<LoginCommand>();
         services.AddTransient<GameshowBuzzerPressedCommand>();
         services.AddTransient<ConnectionInfoLoginCommand>();
+        services.AddTransient<BuzzerInfoResetBuzzerCommand>();
 
         return services;
     }

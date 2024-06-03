@@ -27,16 +27,28 @@ public sealed class ScoreManager : IScoreManager
 
     public void ResetPoints()
     {
-        
+        foreach (IPlayerPointModel playerPointModel in models.Values.SelectMany(x => x.Values))
+        {
+            playerPointModel.Points = 0;
+        }
     }
 
     public void AddPoint(Guid playerId)
     {
-        throw new NotImplementedException();
+        foreach (IPlayerPointModel playerPointModel in models[playerId].Select(x => x.Value))
+        {
+            playerPointModel.Points += 1;
+        }
     }
 
     public void RemovePoint(Guid playerId)
     {
-        throw new NotImplementedException();
+        foreach (IPlayerPointModel playerPointModel in models[playerId].Select(x => x.Value))
+        {
+            if (playerPointModel.Points > 0)
+            {
+                playerPointModel.Points -= 1;
+            }
+        }
     }
 }

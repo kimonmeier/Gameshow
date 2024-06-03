@@ -7,6 +7,22 @@
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <GroupBox Header="Buzzer">
-        
+        <StackPanel>
+            <Label Content="{Binding .BuzzerPressedName}" Background="Green" Foreground="Black">
+                <Label.Style>
+                    <Style TargetType="Label">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding .BuzzerPressed}" Value="True">
+                                <Setter Property="Background" Value="Red"></Setter>
+                                <Setter Property="Foreground" Value="Black"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Label.Style>
+            </Label>
+            <Button Margin="0px 10px" Command="{Binding Path=ResetBuzzerCommand}" CommandParameter="{Binding .}">
+                Reset Buzzer!
+            </Button>
+        </StackPanel>
     </GroupBox>
 </UserControl>
