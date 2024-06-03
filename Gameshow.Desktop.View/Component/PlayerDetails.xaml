@@ -8,22 +8,18 @@
              xmlns:wpf="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="320" d:DesignWidth="435px" Background="Transparent">
-    <DockPanel LastChildFill="True" ClipToBounds="True">
-        <Border BorderThickness="0px 0px 0px 75px" Width="435px" Height="320px" Background="Transparent">
-            <Border.BorderBrush>
+    <StackPanel ClipToBounds="True" Width="435px" Height="320px">
+        <wpf:ChromiumWebBrowser ClipToBounds="True" view:WebBrowserUtil.BindableSource="{Binding Url}"
+                                Height="245px" Width="435px">
+        </wpf:ChromiumWebBrowser>
+        <StackPanel ClipToBounds="True" Height="70px" Width="435px" >
+            <StackPanel.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                     <GradientStop Color="Purple" Offset="0" />
                     <GradientStop Color="MediumVioletRed" Offset="1" />
                 </LinearGradientBrush>
-            </Border.BorderBrush>
-            <StackPanel>
-                <wpf:ChromiumWebBrowser ClipToBounds="True" view:WebBrowserUtil.BindableSource="{Binding Url}"
-                                        Height="245px" Width="435px">
-                </wpf:ChromiumWebBrowser>
-                <ContentControl Margin="0px 232.5px 0px 0px" Height="70px" Width="435px"
-                                Content="{Binding ScoreElement}">
-                </ContentControl>
-            </StackPanel>
-        </Border>
-    </DockPanel>
+            </StackPanel.Background>
+            <local:PlayerName x:Name="PlayerName" Visibility="Hidden" />
+        </StackPanel>
+    </StackPanel>
 </UserControl>

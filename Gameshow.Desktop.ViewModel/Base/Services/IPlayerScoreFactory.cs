@@ -2,7 +2,15 @@
 
 public interface IPlayerScoreFactory
 {
-    UIElement? GetUiElement(Guid? playerId, ScoreType scoreType);
+    event EventHandler<int> PlayerJoined;
+    
+    event EventHandler<int> PlayerLeft;
+
+    event EventHandler<ScoreType> ScoreTypeChanged;
+    
+    BindableBase? GetUiModel(Guid? playerId, ScoreType scoreType);
+
+    PlayerDetailsModel? GetByPlayerNumber(int number);
 
     PlayerDetailsModel GetDetailsModel(Guid playerId);
     

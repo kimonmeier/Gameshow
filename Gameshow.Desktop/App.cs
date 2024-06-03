@@ -2,6 +2,7 @@
 using CefSharp;
 using CefSharp.Wpf;
 using Gameshow.Desktop.Services;
+using Gameshow.Desktop.View;
 using Gameshow.Desktop.View.Windows;
 using Gameshow.Shared.Configuration;
 using Gameshow.Shared.Events.Player.Enums;
@@ -36,6 +37,7 @@ public partial class App : Application
         serviceCollection.AddClientServices(configuration);
 
         serviceProvider = serviceCollection.BuildServiceProvider();
+        DependencyInjectionLocator.Provider = serviceProvider;
 
         #region Set GameState
 

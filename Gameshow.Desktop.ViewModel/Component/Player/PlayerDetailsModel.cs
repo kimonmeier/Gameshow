@@ -5,18 +5,13 @@ public sealed class PlayerDetailsModel : BindableBase
     private string? name;
     private string? url;
     private ScoreType scoreType;
-    private UIElement? scoreElement;
     private bool isBuzzerPressed;
 
-    private readonly IPlayerScoreFactory playerDetailsFactory;
-    private readonly Guid? playerGuid;
-
-    public PlayerDetailsModel(IPlayerScoreFactory playerDetailsFactory, PlayerInformation playerInformation)
+    public PlayerDetailsModel(PlayerInformation playerInformation)
     {
-        this.playerDetailsFactory = playerDetailsFactory;
-        playerGuid = playerInformation.PlayerId;
         name = playerInformation.Name;
         url = playerInformation.Link;
+        PlayerId = playerInformation.PlayerId;
     }
 
     [Obsolete("Just for Designer")]
@@ -26,6 +21,8 @@ public sealed class PlayerDetailsModel : BindableBase
     {
         
     }
+    
+    public Guid PlayerId { get; init; }
 
     public ScoreType ScoreType
     {
@@ -34,7 +31,6 @@ public sealed class PlayerDetailsModel : BindableBase
         {
             scoreType = value;
             OnPropertyChanged();
-            ScoreElement = playerDetailsFactory.GetUiElement(playerGuid, value);
         }
     }
 
@@ -54,16 +50,6 @@ public sealed class PlayerDetailsModel : BindableBase
         set
         {
             name = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public UIElement? ScoreElement
-    {
-        get => scoreElement;
-        set
-        {
-            scoreElement = value;
             OnPropertyChanged();
         }
     }

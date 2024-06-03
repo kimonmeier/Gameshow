@@ -2,48 +2,45 @@
 
 public sealed class PlayerScoreFactory : IPlayerScoreFactory
 {
-    private readonly Dictionary<Guid, Dictionary<ScoreType, UIElement?>> playerElements = new();
-    private readonly Dictionary<Guid, PlayerDetails> playerDetails = new();
-    private readonly GameshowViewModel gameshowViewModel;
+    public event EventHandler<int>? PlayerJoined;
+
+    public event EventHandler<int>? PlayerLeft;
+
+    public event EventHandler<ScoreType>? ScoreTypeChanged;
+
+    private readonly Dictionary<Guid, Dictionary<ScoreType, BindableBase?>> playerElements = new();
+    private readonly Dictionary<Guid, PlayerDetailsModel> playerDetailsModels = new();
     private readonly ScoreManager scoreManager;
 
-    public PlayerScoreFactory(GameshowViewModel gameshowViewModel, ScoreManager scoreManager)
+    public PlayerScoreFactory(ScoreManager scoreManager)
     {
-        this.gameshowViewModel = gameshowViewModel;
         this.scoreManager = scoreManager;
     }
 
-    public UIElement? GetUiElement(Guid? playerId, ScoreType scoreType)
+    public BindableBase? GetUiModel(Guid? playerId, ScoreType scoreType)
     {
         return playerElements.GetValueOrDefault(playerId ?? Guid.Empty)?.GetValueOrDefault(scoreType);
     }
 
+    public PlayerDetailsModel? GetByPlayerNumber(int number)
+    {
+        return playerDetailsModels.ElementAtOrDefault(number).Value;
+    }
+
     public PlayerDetailsModel GetDetailsModel(Guid playerId)
     {
-        return (PlayerDetailsModel)playerDetails[playerId].DataContext;
+        return playerDetailsModels[playerId];
     }
 
     public void RegisterPlayer(PlayerInformation playerInformation)
     {
+        playerElements.Add(playerInformation.PlayerId, CreateDefaultPlayer(playerInformation));
+        
+        playerDetailsModels.Add(playerInformation.PlayerId, new(playerInformation));
+
         Application.Current.Dispatcher.Invoke(delegate
         {
-            playerElements.Add(playerInformation.PlayerId, CreateDefaultPlayer(playerInformation));
-            
-            PlayerDetails playerUiElement = new(new PlayerDetailsModel(this, playerInformation));
-            playerDetails.Add(playerInformation.PlayerId, playerUiElement);
-
-            if (gameshowViewModel.PlayerInfo1 == null)
-            {
-                gameshowViewModel.PlayerInfo1 = playerUiElement;
-            }
-            else if (gameshowViewModel.PlayerInfo2 == null)
-            {
-                gameshowViewModel.PlayerInfo2 = playerUiElement;
-            }
-            else
-            {
-                throw new ApplicationException("Something went wrong. The registered Player is weird");
-            }
+            PlayerJoined?.Invoke(this, playerElements.Count - 1);
         });
     }
 
@@ -51,31 +48,17 @@ public sealed class PlayerScoreFactory : IPlayerScoreFactory
     {
         Application.Current.Dispatcher.Invoke(delegate
         {
-            PlayerDetails playerUiElement = playerDetails[playerId];
-
-            playerElements.Remove(playerId);
-            playerDetails.Remove(playerId);
-            scoreManager.RemovePlayer(playerId);
-
-
-            if (gameshowViewModel.PlayerInfo1 == playerUiElement)
-            {
-                gameshowViewModel.PlayerInfo1 = null;
-            }
-            else if (gameshowViewModel.PlayerInfo2 == playerUiElement)
-            {
-                gameshowViewModel.PlayerInfo2 = null;
-            }
-            else
-            {
-                throw new ApplicationException("Something went wrong. The registered Player was not displayed on the UI!");
-            }
+            PlayerLeft?.Invoke(this, playerElements.Count - 1);
         });
+        
+        playerElements.Remove(playerId);
+        playerDetailsModels.Remove(playerId);
+        scoreManager.RemovePlayer(playerId);
     }
 
-    private Dictionary<ScoreType, UIElement?> CreateDefaultPlayer(PlayerInformation player)
+    private Dictionary<ScoreType, BindableBase?> CreateDefaultPlayer(PlayerInformation player)
     {
-        Dictionary<ScoreType, UIElement?> elements = new();
+        Dictionary<ScoreType, BindableBase?> elements = new();
 
         #region Buzzer
         
@@ -84,10 +67,9 @@ public sealed class PlayerScoreFactory : IPlayerScoreFactory
             PlayerId = player.PlayerId,
             PlayerName = player.Name,
         };
-        PlayerName playerNameView = new(playerNameModel);
         scoreManager.RegisterModel(player.PlayerId, ScoreType.None, playerNameModel);
         
-        elements.Add(ScoreType.None, playerNameView);
+        elements.Add(ScoreType.None, playerNameModel);
         
         #endregion
         
