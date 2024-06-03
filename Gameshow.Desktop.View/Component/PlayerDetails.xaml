@@ -7,9 +7,9 @@
              xmlns:local="clr-namespace:Gameshow.Desktop.View.Component"
              xmlns:wpf="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
              mc:Ignorable="d"
-             d:DesignHeight="320" d:DesignWidth="450" Background="Transparent">
-    <DockPanel LastChildFill="True">
-        <Border BorderThickness="10px 10px 10px 75px" Width="450px" Height="320px" CornerRadius="75 75 0 0" Background="Black">
+             d:DesignHeight="320" d:DesignWidth="435px" Background="Transparent">
+    <DockPanel LastChildFill="True" ClipToBounds="True">
+        <Border BorderThickness="0px 0px 0px 75px" Width="435px" Height="320px" Background="Transparent">
             <Border.BorderBrush>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                     <GradientStop Color="Purple" Offset="0" />
@@ -17,8 +17,12 @@
                 </LinearGradientBrush>
             </Border.BorderBrush>
             <StackPanel>
-                <wpf:ChromiumWebBrowser ClipToBounds="True" view:WebBrowserUtil.BindableSource="{Binding Url}" Height="235px" Width="417px"></wpf:ChromiumWebBrowser>
-                <ContentControl Margin="0px 242.5px 0px 0px" Height="60px" Width="417px" Content="{Binding ScoreElement}"></ContentControl>
+                <wpf:ChromiumWebBrowser ClipToBounds="True" view:WebBrowserUtil.BindableSource="{Binding Url}"
+                                        Height="245px" Width="435px">
+                </wpf:ChromiumWebBrowser>
+                <ContentControl Margin="0px 232.5px 0px 0px" Height="70px" Width="435px"
+                                Content="{Binding ScoreElement}">
+                </ContentControl>
             </StackPanel>
         </Border>
     </DockPanel>
